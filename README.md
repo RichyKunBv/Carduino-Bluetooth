@@ -1,7 +1,5 @@
 # Carduino
 
-**Documentación del Proyecto**
-
 ### 1. Descripción General
 Este proyecto consiste en un vehículo autónomo controlado vía Bluetooth con sensores ultrasónicos para detección de obstáculos, un LCD para visualización de estado y luces/buzzer para señalización.
 
@@ -56,7 +54,60 @@ Los comandos permiten encender y apagar luces y el buzzer:
 - La velocidad mínima permitida es de 84 (evitando velocidades muy bajas).
 - Se implementa un sistema de bandera (`flag`) para activar funciones adicionales.
 
-### 5. Mejoras Futuras
-- Implementación de un algoritmo de evasión de obstáculos.
-- Agregar sensores adicionales para mejorar la detección.
 
+
+English
+
+### 1. General Description
+This project consists of an autonomous vehicle controlled via Bluetooth with ultrasonic sensors for obstacle detection, an LCD for status display and lights/buzzer for signaling.
+
+### 2. Devices and Pins Used
+
+#### 2.1. LCD Display (LiquidCrystal)
+Connected in 4-bit mode:
+- RS -> Pin 40
+- E -> Pin 41
+- D4 -> Pin 42
+- D5 -> Pin 43
+- D6 -> Pin 44
+- D7 -> Pin 45
+
+#### 2.2. Motor Controller (MotorShieldR3)
+The `Car` object handles the locomotion of the vehicle with predefined functions.
+
+#### 2.3. Ultrasonic Sensors
+Each sensor consists of a TRIG pin and an ECHO pin:
+- **Front:** TRIG_F -> Pin 28, ECHO_F -> Pin 29
+- **Right:** TRIG_D -> Pin 30, ECHO_D -> Pin 31
+- **Left:** TRIG_I -> Pin 32, ECHO_I -> Pin 33
+- **Rear:** TRIG_A -> Pin 34, ECHO_A -> Pin 35
+
+#### 2.4. Lights and Buzzer
+- **Front lights:** Pin 7
+- **Rear lights:** Pin 4
+- **Prevention lights:** Pin 10
+- **Buzzer:** Pin 6
+
+### 3. Functionality
+#### 3.1. Vehicle Control
+The vehicle responds to Bluetooth commands to move in different directions:
+- **F:** Forward
+- **B:** Backward
+- **L:** Turn left
+- **R:** Turn right
+- **S:** Stop
+- **I, J, G, H:** Diagonal movements
+
+#### 3.2. Obstacle Sensing
+Every 200 ms, distances are measured with the ultrasonic sensors. If an obstacle is less than 5 cm away, the buzzer emits a tone and the LCD displays "You crashed!". If it is between 5 and 10 cm, the direction of the obstacle is indicated on the LCD screen.
+
+#### 3.3. Lights and Buzzer Control
+The commands allow you to turn on and off lights and the buzzer:
+- **W/w:** Turn on/off front lights
+- **U/u:** Turn on/off rear lights
+- **V/v:** Activate/deactivate buzzer
+
+### 4. Considerations
+- The vehicle adjusts its speed with values ​​from 0 to 9.
+- The minimum speed allowed is 84 (avoiding very low speeds).
+- A flag system is implemented to activate additional functions.
