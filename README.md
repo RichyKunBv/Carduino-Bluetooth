@@ -1,5 +1,6 @@
 # Carduino
 
+
 ### 1. Descripción General
 Este proyecto consiste en un vehículo autónomo controlado vía Bluetooth con sensores ultrasónicos para detección de obstáculos, un LCD para visualización de estado y luces/buzzer para señalización.
 
@@ -14,21 +15,32 @@ Conectada en modo 4 bits:
 - D6 -> Pin 44
 - D7 -> Pin 45
 
-#### 2.2. Controlador de Motor (MotorShieldR3)
-El objeto `Car` maneja la locomoción del vehículo con funciones predefinidas.
+#### 2.2. Módulo de Motores (MotorShieldR3)
+El objeto `Car` maneja la locomoción del vehículo con funciones predefinidas para moverse en distintas direcciones y ajustar la velocidad.
 
-#### 2.3. Sensores Ultrasónicos
+#### 2.3. Módulo Bluetooth
+El módulo Bluetooth está conectado a través del puerto serie del microcontrolador:
+- **RX:** Recibe datos desde el dispositivo remoto (conectado a TX del microcontrolador).
+- **TX:** Envía datos al dispositivo remoto (conectado a RX del microcontrolador).
+- **Baud Rate:** 9600 bps.
+
+#### 2.4. Sensores Ultrasónicos
 Cada sensor consta de un pin TRIG y un pin ECHO:
 - **Frontal:** TRIG_F -> Pin 28, ECHO_F -> Pin 29
 - **Derecho:** TRIG_D -> Pin 30, ECHO_D -> Pin 31
 - **Izquierdo:** TRIG_I -> Pin 32, ECHO_I -> Pin 33
 - **Trasero:** TRIG_A -> Pin 34, ECHO_A -> Pin 35
 
-#### 2.4. Luces y Buzzer
+#### 2.5. Luces y Buzzer
 - **Luces frontales:** Pin 7
 - **Luces traseras:** Pin 4
 - **Luces de prevención:** Pin 10
 - **Buzzer:** Pin 6
+
+#### 2.6. Método de Alimentación
+El sistema utiliza dos baterías de 9V:
+- **Batería 1:** Alimenta el Arduino.
+- **Batería 2:** Alimenta el módulo de motores.
 
 ### 3. Funcionalidad
 #### 3.1. Control del Vehículo
@@ -56,7 +68,10 @@ Los comandos permiten encender y apagar luces y el buzzer:
 
 
 
+
+
 English
+
 
 ### 1. General Description
 This project consists of an autonomous vehicle controlled via Bluetooth with ultrasonic sensors for obstacle detection, an LCD for status display and lights/buzzer for signaling.
@@ -72,21 +87,32 @@ Connected in 4-bit mode:
 - D6 -> Pin 44
 - D7 -> Pin 45
 
-#### 2.2. Motor Controller (MotorShieldR3)
-The `Car` object handles the locomotion of the vehicle with predefined functions.
+#### 2.2. Motor Module (MotorShieldR3)
+The `Car` object handles the locomotion of the vehicle with predefined functions to move in different directions and adjust the speed.
 
-#### 2.3. Ultrasonic Sensors
+#### 2.3. Bluetooth Module
+The Bluetooth module is connected through the serial port of the microcontroller:
+- **RX:** Receives data from the remote device (connected to TX of the microcontroller).
+- **TX:** Sends data to the remote device (connected to RX of the microcontroller).
+- **Baud Rate:** 9600 bps.
+
+#### 2.4. Ultrasonic Sensors
 Each sensor consists of a TRIG pin and an ECHO pin:
 - **Front:** TRIG_F -> Pin 28, ECHO_F -> Pin 29
 - **Right:** TRIG_D -> Pin 30, ECHO_D -> Pin 31
 - **Left:** TRIG_I -> Pin 32, ECHO_I -> Pin 33
 - **Rear:** TRIG_A -> Pin 34, ECHO_A -> Pin 35
 
-#### 2.4. Lights and Buzzer
+#### 2.5. Lights and Buzzer
 - **Front lights:** Pin 7
 - **Rear lights:** Pin 4
-- **Prevention lights:** Pin 10
+- **Warning lights:** Pin 10
 - **Buzzer:** Pin 6
+
+#### 2.6. Power Supply Method
+The system uses two 9V batteries:
+- **Battery 1:** Powers the Arduino.
+- **Battery 2:** Powers the motor module.
 
 ### 3. Functionality
 #### 3.1. Vehicle Control
@@ -99,7 +125,7 @@ The vehicle responds to Bluetooth commands to move in different directions:
 - **I, J, G, H:** Diagonal movements
 
 #### 3.2. Obstacle Sensing
-Every 200 ms, distances are measured with the ultrasonic sensors. If an obstacle is less than 5 cm away, the buzzer emits a tone and the LCD displays "You crashed!". If it is between 5 and 10 cm, the direction of the obstacle is indicated on the LCD screen.
+Distances are measured every 200 ms with the ultrasonic sensors. If an obstacle is less than 5 cm away, the buzzer emits a tone and the LCD displays "You crashed!". If it is between 5 and 10 cm, the direction of the obstacle is indicated on the LCD screen.
 
 #### 3.3. Lights and Buzzer Control
 The commands allow you to turn on and off lights and the buzzer:
