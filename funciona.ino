@@ -35,7 +35,7 @@ int lastObstacle = -1; // Para evitar refrescar el LCD innecesariamente
 void setup() {
     Serial.begin(9600); // Bluetooth
     lcd.begin(16, 2);
-    
+
     // Configurar pines de sensores ultrasónicos
     pinMode(TRIG_F, OUTPUT); pinMode(ECHO_F, INPUT);
     pinMode(TRIG_D, OUTPUT); pinMode(ECHO_D, INPUT);
@@ -57,7 +57,7 @@ long medirDistancia(int trig, int echo) {
     digitalWrite(trig, HIGH);
     delayMicroseconds(10);
     digitalWrite(trig, LOW);
-    return pulseIn(echo, HIGH) / 58;  // Convertir a cm
+    return pulseIn(echo, HIGH, 20000) / 58;  // Convertir a cm con timeout
 }
 
 void actualizarSensores() {
@@ -68,16 +68,14 @@ void actualizarSensores() {
 
     int obstaculo = -1;
     if (distanciaF <= 5 || distanciaD <= 5 || distanciaI <= 5 || distanciaA <= 5) {
-        // Si algún sensor detecta un objeto a menos de 5 cm, se considera un "chocaste"
-        obstaculo = 5;  // Nuevo código para choque
-        tone(pinbuzzer, 1000);  // Emite un tono de 1000 Hz cuando se detecta el choque
+        obstaculo = 5;  // Chocaste
+        tone(pinbuzzer, 1000);
     } else if (distanciaF <= 10) obstaculo = 0;
     else if (distanciaD <= 10) obstaculo = 1;
     else if (distanciaI <= 10) obstaculo = 2;
     else if (distanciaA <= 10) obstaculo = 3;
     else obstaculo = 4;
 
-    // Actualizar el LCD solo cuando haya un cambio en el obstáculo
     if (obstaculo != lastObstacle) {
         lcd.clear();
         lcd.setCursor(0, 0);
@@ -86,92 +84,57 @@ void actualizarSensores() {
             case 1: lcd.print("Obstaculo Derecha"); break;
             case 2: lcd.print("Obstaculo Izquierda"); break;
             case 3: lcd.print("Obstaculo Atras"); break;
-            case 5: lcd.print("Chocaste!"); break; // Caso de choque
+            case 5: lcd.print("Chocaste!"); break;
             default: lcd.print("Libre");
         }
         lastObstacle = obstaculo;
     }
 
-    // Detener el buzzer si no hay choque
     if (obstaculo != 5) {
         noTone(pinbuzzer);
     }
 }
 
 void loop() {
+    // Bluetooth en alta prioridad
     if (Serial.available() > 0) { 
         prevCommand = command;
         command = Serial.read();
         if (command != prevCommand) {
             Serial.println(command);
             switch (command) {
-                case 'F': 
-                    Car.Forward_2W(velocity, velocity); 
-                    break;
-                case 'B': 
-                    Car.Back_2W(velocity, velocity); 
-                    break;
-                case 'L': 
-                    Car.RotateLeft_2W(velocity, velocity); 
-                    break;
-                case 'R': 
-                    Car.RotateRight_2W(velocity, velocity); 
-                    break;
-                case 'S': 
-                    Car.Stopped_2W(); 
-                    break;
-                case 'I': 
-                    Car.ForwardRight_2W(velocity, velocity); 
-                    break;
-                case 'J': 
-                    Car.BackRight_2W(velocity, velocity); 
-                    break;
-                case 'G': 
-                    Car.ForwardLeft_2W(velocity, velocity); 
-                    break;
-                case 'H': 
-                    Car.BackLeft_2W(velocity, velocity); 
-                    break;
-                case 'W': 
-                    digitalWrite(pinfrontLights, HIGH); 
-                    break;
-                case 'w': 
-                    digitalWrite(pinfrontLights, LOW); 
-                    break;
-                case 'U': 
-                    digitalWrite(pinbackLights, HIGH); 
-                    break;
-                case 'u': 
-                    digitalWrite(pinbackLights, LOW); 
-                    break;
-                case 'X': 
-                    flag = true; 
-                    break;
-                case 'x': 
-                    flag = false; 
-                    digitalWrite(pinpreventLights, LOW); 
-                    break;
-                case 'V': 
-                    tone(pinbuzzer, 1000); 
-                    break;
-                case 'v': 
-                    noTone(pinbuzzer); 
-                    break;
-                case 'D': 
+                case 'F': Car.Forward_2W(velocity, velocity); break;
+                case 'B': Car.Back_2W(velocity, velocity); break;
+                case 'L': Car.RotateLeft_2W(velocity, velocity); break;
+                case 'R': Car.RotateRight_2W(velocity, velocity); break;
+                case 'S': Car.Stopped_2W(); break;
+                case 'I': Car.ForwardRight_2W(velocity, velocity); break;
+                case 'J': Car.BackRight_2W(velocity, velocity); break;
+                case 'G': Car.ForwardLeft_2W(velocity, velocity); break;
+                case 'H': Car.BackLeft_2W(velocity, velocity); break;
+                case 'W': digitalWrite(pinfrontLights, HIGH); break;
+                case 'w': digitalWrite(pinfrontLights, LOW); break;
+                case 'U': digitalWrite(pinbackLights, HIGH); break;
+                case 'u': digitalWrite(pinbackLights, LOW); break;
+                case 'X': flag = true; break;
+                case 'x': flag = false; digitalWrite(pinpreventLights, LOW); break;
+                case 'V': tone(pinbuzzer, 1000); break;
+                case 'v': noTone(pinbuzzer); break;
+                case 'D':
                     digitalWrite(pinfrontLights, LOW);
                     digitalWrite(pinbackLights, LOW);
                     Car.Stopped_2W();
                     break;
                 default:
                     if (command >= '0' && command <= '9') {
-                        velocity = max((command - '0') * 28, 84); // Evita velocidades muy bajas
+                        velocity = max((command - '0') * 28, 84);
                         Car.SetSpeed_2W(velocity, velocity);
                     }
             }
         }
     }
 
-    // Actualizar sensores solo después del intervalo de tiempo establecido
+    // Sensores en segundo plano
     if (millis() - lastSensorRead >= sensorInterval) {
         actualizarSensores();
         lastSensorRead = millis();
